@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>클래스유 입·퇴사 체크리스트</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f4f5f7;
+      color: #222;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 28px; }
+    .logo { font-size: 26px; font-weight: 900; }
+    .logo span { color: #e8001c; }
+    .sub { font-size: 13px; color: #888; margin-top: 4px; }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      background: #fff; border-radius: 12px; padding: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 20px;
+    }
+    .btn {
+      border: none; border-radius: 8px; padding: 9px 14px;
+      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .btn-primary { background: #e8001c; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn:hover { opacity: .92; }
+
+    .summary {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px; margin-bottom: 20px;
+    }
+    .sum-card {
+      background: #fff; border-radius: 10px; padding: 14px; text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .sum-card .n { font-size: 24px; font-weight: 800; color: #e8001c; }
+    .sum-card .l { font-size: 11px; color: #888; margin-top: 2px; }
+
+    .panel {
+      background: #fff; border-radius: 14px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px;
+    }
+    .panel h2 { font-size: 16px; margin-bottom: 14px; }
+
+    .form-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px; align-items: end;
+    }
+    label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
+    input, select {
+      width: 100%; padding: 9px 10px; border: 1px solid #ddd;
+      border-radius: 8px; font-family: inherit; font-size: 14px;
+    }
+
+    .cards { display: grid; gap: 14px; }
+    .card { background: #fff; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+    .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .name { font-size: 18px; font-weight: 700; }
+    .badge {
+      font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 12px; margin-left: 6px;
+    }
+    .badge-on { background: #e8f5e9; color: #2e7d32; }
+    .badge-off { background: #fff3e0; color: #e65100; }
+    .meta { font-size: 12px; color: #777; margin-top: 3px; }
+    .pct { font-size: 13px; font-weight: 600; text-align: right; }
+    .bar { height: 7px; background: #eee; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+    .bar > div { height: 100%; background: #e8001c; }
+
+    .checks { display: grid; gap: 6px; margin-top: 10px; }
+    .check {
+      display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px;
+      border-radius: 8px; background: #fafafa; font-size: 14px;
+    }
+    .check.pending { background: #fff8f8; border: 1px solid #ffd0d0; }
+    .check.overdue { border: 1px solid #e8001c; background: #fff0f0; }
+    .check.done { opacity: .55; text-decoration: line-through; }
+    .check input { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; }
+    .small { font-size: 11px; color: #999; margin-top: 2px; }
+    .card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+
+    .empty { text-align: center; color: #888; padding: 40px 10px; }
+    .modal-bg {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 520px;
+    }
+    .modal textarea {
+      width: 100%; height: 240px; margin: 10px 0; padding: 10px;
+      font-family: monospace; font-size: 13px; border: 1px solid #ddd; border-radius: 8px;
+    }
+    .hint { font-size: 12px; color: #888; text-align: center; margin-top: 16px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">Class<span>U</span></div>
+      <div class="sub">입·퇴사 체크리스트</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-secondary" id="exportBtn">JSON 백업</button>
+      <button class="btn btn-secondary" id="importBtn">JSON 복원</button>
+      <input type="file" id="importFile" accept=".json" hidden />
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <div class="panel">
+      <h2>신규 등록</h2>
+      <div class="form-grid">
+        <div>
+          <label>이름 *</label>
+          <input id="name" placeholder="홍길동" />
+        </div>
+        <div>
+          <label>유형 *</label>
+          <select id="type">
+            <option value="온보딩">온보딩</option>
+            <option value="오프보딩">오프보딩</option>
+          </select>
+        </div>
+        <div>
+          <label>기준일 (입사/퇴사) *</label>
+          <input id="baseDate" type="date" />
+        </div>
+        <div>
+          <label>부서</label>
+          <input id="dept" placeholder="개발" />
+        </div>
+        <div>
+          <button class="btn btn-primary" id="addBtn" style="width:100%">체크리스트 생성</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+    <p class="hint">데이터는 이 브라우저에 저장됩니다. 주기적으로 JSON 백업을 권장합니다.</p>
+  </div>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <strong>슬랙 공유 문구</strong>
+      <textarea id="slackText" readonly></textarea>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" id="copyBtn">복사</button>
+        <button class="btn btn-secondary" id="closeModal">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MASTER = [
+      { type:'온보딩', category:'HR', order:1, item:'근로계약서 발송·서명', deadline:'D-7', assignee:'HR' },
+      { type:'온보딩', category:'HR', order:2, item:'개인정보 수집·이용 동의', deadline:'D-7', assignee:'HR' },
+      { type:'온보딩', category:'HR', order:3, item:'입사 서류 수집 (통장·주민등록등본 등)', deadline:'D-5', assignee:'HR' },
+      { type:'온보딩', category:'급여', order:4, item:'4대보험 취득 신고', deadline:'D-3', assignee:'급여담당자' },
+      { type:'온보딩', category:'HR', order:5, item:'법인카드 생성', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'IT', order:6, item:'Google 계정 / 이메일 생성', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'IT', order:7, item:'Slack 초대', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'IT', order:8, item:'노션 초대', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'IT', order:9, item:'근태관리 시스템 초대', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'IT', order:10, item:'노트북·모니터 준비', deadline:'D-3', assignee:'HR' },
+      { type:'온보딩', category:'HR', order:11, item:'지문 등록 및 출퇴근 안내', deadline:'입사당일', assignee:'HR' },
+      { type:'온보딩', category:'HR', order:12, item:'법정 의무교육 이수 확인', deadline:'입사후1주', assignee:'HR' },
+      { type:'오프보딩', category:'HR', order:1, item:'퇴사일 확정', deadline:'퇴사2주전', assignee:'HR' },
+      { type:'오프보딩', category:'HR', order:2, item:'사직서 작성', deadline:'퇴사1주전', assignee:'HR' },
+      { type:'오프보딩', category:'HR', order:3, item:'비밀유지서약서 작성', deadline:'퇴사당일', assignee:'HR' },
+      { type:'오프보딩', category:'급여', order:4, item:'4대보험 상실 신고', deadline:'퇴사당일', assignee:'급여담당자' },
+      { type:'오프보딩', category:'HR', order:5, item:'법인카드·장비 회수', deadline:'퇴사당일', assignee:'HR' },
+      { type:'오프보딩', category:'IT', order:6, item:'이메일·Slack·노션 비활성화', deadline:'퇴사당일', assignee:'HR' },
+      { type:'오프보딩', category:'IT', order:7, item:'노트북 초기화·회수', deadline:'퇴사당일', assignee:'HR' },
+    ];
+
+    const STORAGE_KEY = 'classu_onoff_checklist_v1';
+    let data = load();
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { people: [], checks: [], seq: 1 };
+      } catch { return { people: [], checks: [], seq: 1 }; }
+    }
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); render(); }
+
+    function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+    function parseDate(s) { if (!s) return null; const d = new Date(s); d.setHours(0,0,0,0); return isNaN(d) ? null : d; }
+    function fmt(d) {
+      if (!d) return '';
+      const x = typeof d === 'string' ? parseDate(d) : d;
+      return `${x.getFullYear()}.${String(x.getMonth()+1).padStart(2,'0')}.${String(x.getDate()).padStart(2,'0')}`;
+    }
+    function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
+    function dueDate(base, rule) {
+      const m = { 'D-7':-7,'D-5':-5,'D-3':-3,'입사당일':0,'입사후1주':7,'퇴사2주전':-14,'퇴사1주전':-7,'퇴사당일':0,'퇴사후1주':7 };
+      return addDays(base, m[rule] ?? 0);
+    }
+    function toISO(d) { return d.toISOString().slice(0,10); }
+
+    function nextId(type, baseDate) {
+      const prefix = type === '오프보딩' ? 'OF' : 'OB';
+      const year = baseDate.getFullYear();
+      const same = data.people.filter(p => p.id.startsWith(`${prefix}-${year}-`));
+      const max = same.reduce((n, p) => Math.max(n, parseInt(p.id.split('-')[2],10)||0), 0);
+      return `${prefix}-${year}-${String(max+1).padStart(3,'0')}`;
+    }
+
+    document.getElementById('addBtn').onclick = () => {
+      const name = document.getElementById('name').value.trim();
+      const type = document.getElementById('type').value;
+      const base = parseDate(document.getElementById('baseDate').value);
+      const dept = document.getElementById('dept').value.trim();
+      if (!name || !base) return alert('이름과 기준일을 입력해주세요.');
+
+      const id = nextId(type, base);
+      data.people.push({ id, name, type, baseDate: toISO(base), dept, status:'진행중' });
+      MASTER.filter(m => m.type === type).forEach(m => {
+        data.checks.push({
+          id: `${id}-CHK-${String(m.order).padStart(2,'0')}`,
+          personId: id, name, type, category: m.category, order: m.order,
+          item: m.item, deadline: m.deadline, dueDate: toISO(dueDate(base, m.deadline)),
+          assignee: m.assignee, done: false, doneDate: ''
+        });
+      });
+      document.getElementById('name').value = '';
+      document.getElementById('dept').value = '';
+      save();
+    };
+
+    function toggleCheck(checkId, done) {
+      const c = data.checks.find(x => x.id === checkId);
+      if (!c) return;
+      c.done = done;
+      c.doneDate = done ? toISO(today()) : '';
+      const items = data.checks.filter(x => x.personId === c.personId);
+      const p = data.people.find(x => x.id === c.personId);
+      if (p) p.status = items.every(x => x.done) ? '완료' : '진행중';
+      save();
+    }
+
+    function removePerson(id) {
+      if (!confirm('삭제할까요?')) return;
+      data.people = data.people.filter(p => p.id !== id);
+      data.checks = data.checks.filter(c => c.personId !== id);
+      save();
+    }
+
+    function slackMsg(personId) {
+      const p = data.people.find(x => x.id === personId);
+      const checks = data.checks.filter(c => c.personId === personId).sort((a,b)=>a.order-b.order);
+      const done = checks.filter(c => c.done);
+      const pending = checks.filter(c => !c.done);
+      const pct = checks.length ? Math.round(done.length/checks.length*100) : 0;
+      const emoji = p.type === '오프보딩' ? '📤' : '📋';
+      const label = p.type === '오프보딩' ? '퇴사' : '입사';
+      const lines = [
+        `${emoji} *[${p.type}] ${p.name}님* (${fmt(p.baseDate)} ${label})`,
+        `진행률: ${done.length}/${checks.length} (${pct}%)`, ''
+      ];
+      if (done.length) { lines.push('*완료*'); done.forEach(c => lines.push(`✅ ${c.item}`)); lines.push(''); }
+      if (pending.length) {
+        lines.push('*미완료*');
+        pending.forEach(c => {
+          const overdue = parseDate(c.dueDate) < today();
+          const flag = overdue ? '🔴 ' : '⏳ ';
+          const extra = c.assignee !== 'HR' ? ` @${c.assignee}` : '';
+          lines.push(`${flag}${c.item} — 마감 ${fmt(c.dueDate)}${extra}`);
+        });
+      }
+      document.getElementById('slackText').value = lines.join('\n');
+      document.getElementById('modal').classList.add('open');
+    }
+
+    document.getElementById('copyBtn').onclick = () => {
+      const t = document.getElementById('slackText');
+      t.select();
+      document.execCommand('copy');
+      alert('복사되었습니다.');
+    };
+    document.getElementById('closeModal').onclick = () => document.getElementById('modal').classList.remove('open');
+
+    document.getElementById('exportBtn').onclick = () => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `입퇴사_백업_${toISO(today())}.json`;
+      a.click();
+    };
+    document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+    document.getElementById('importFile').onchange = e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          data = JSON.parse(r.result);
+          save();
+          alert('복원 완료');
+        } catch { alert('JSON 파일이 올바르지 않습니다.'); }
+      };
+      r.readAsText(f);
+      e.target.value = '';
+    };
+
+    function render() {
+      const active = data.people.filter(p => p.status !== '완료');
+      let totalDone = 0, totalAll = 0, overdue = 0;
+      const t = today();
+
+      data.checks.forEach(c => {
+        totalAll++;
+        if (c.done) totalDone++;
+        else if (parseDate(c.dueDate) < t) overdue++;
+      });
+
+      document.getElementById('summary').innerHTML = `
+        <div class="sum-card"><div class="n">${active.length}</div><div class="l">진행 중</div></div>
+        <div class="sum-card"><div class="n">${data.people.filter(p=>p.type==='온보딩'&&p.status!=='완료').length}</div><div class="l">온보딩</div></div>
+        <div class="sum-card"><div class="n">${data.people.filter(p=>p.type==='오프보딩'&&p.status!=='완료').length}</div><div class="l">오프보딩</div></div>
+        <div class="sum-card"><div class="n">${totalAll?Math.round(totalDone/totalAll*100):0}%</div><div class="l">전체 완료율</div></div>
+        <div class="sum-card"><div class="n">${overdue}</div><div class="l">기한 지남</div></div>`;
+
+      const list = data.people.filter(p => p.status !== '완료');
+      if (!list.length) {
+        document.getElementById('cards').innerHTML = '<div class="panel empty">진행 중인 입·퇴사자가 없습니다.<br>위에서 신규 등록해주세요.</div>';
+        return;
+      }
+
+      document.getElementById('cards').innerHTML = list.map(p => {
+        const checks = data.checks.filter(c => c.personId === p.id).sort((a,b)=>a.order-b.order);
+        const done = checks.filter(c => c.done).length;
+        const pct = checks.length ? Math.round(done/checks.length*100) : 0;
+        const badge = p.type === '오프보딩' ? 'badge-off' : 'badge-on';
+        const checksHtml = checks.map(c => {
+          const overdue = !c.done && parseDate(c.dueDate) < t;
+          const cls = c.done ? 'done' : (overdue ? 'overdue' : 'pending');
+          return `<label class="check ${cls}">
+            <input type="checkbox" ${c.done?'checked':''} onchange="toggleCheck('${c.id}', this.checked)" />
+            <div>
+              <div>${c.item}</div>
+              <div class="small">${c.category} · 마감 ${fmt(c.dueDate)}${c.assignee!=='HR'?' · '+c.assignee:''}</div>
+            </div>
+          </label>`;
+        }).join('');
+        return `<article class="card">
+          <div class="card-head">
+            <div>
+              <div class="name">${p.name}<span class="badge ${badge}">${p.type}</span></div>
+              <div class="meta">${p.dept||'-'} · ${fmt(p.baseDate)} · ${p.id}</div>
+            </div>
+            <div style="min-width:120px">
+              <div class="pct">${done}/${checks.length} (${pct}%)</div>
+              <div class="bar"><div style="width:${pct}%"></div></div>
+            </div>
+          </div>
+          <div class="checks">${checksHtml}</div>
+          <div class="card-actions">
+            <button class="btn btn-secondary" onclick="slackMsg('${p.id}')">슬랙 문구</button>
+            <button class="btn btn-secondary" onclick="removePerson('${p.id}')">삭제</button>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    window.toggleCheck = toggleCheck;
+    window.slackMsg = slackMsg;
+    window.removePerson = removePerson;
+    render();
+  </script>
+</body>
+</html>

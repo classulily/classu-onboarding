@@ -285,8 +285,8 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="btn btn-ghost" id="exportBtn">JSON 백업</button>
-        <button class="btn btn-ghost" id="importBtn">JSON 복원</button>
+        <button class="btn btn-ghost" id="exportBtn">다운로드</button>
+        <button class="btn btn-ghost" id="importBtn">업로드</button>
         <button class="btn btn-red" id="openAddBtn">+ 신규 등록</button>
         <input type="file" id="importFile" accept=".json" hidden />
       </div>
@@ -312,7 +312,7 @@
       <div class="panel detail" id="detailPanel"></div>
     </div>
 
-    <p class="footer-hint">데이터는 이 브라우저에 저장됩니다 · 주기적으로 JSON 백업 권장</p>
+    <p class="footer-hint">데이터는 이 브라우저에 저장됩니다 · 주기적으로 다운로드해 보관하세요</p>
   </div>
 
   <!-- 신규 등록 모달 -->
@@ -599,8 +599,8 @@
           data = JSON.parse(r.result);
           state.selectedId = null;
           save();
-          alert('복원 완료');
-        } catch { alert('JSON 파일이 올바르지 않습니다.'); }
+          alert('업로드 완료');
+        } catch { alert('파일 형식이 올바르지 않습니다. 다운로드한 파일을 선택해주세요.'); }
       };
       r.readAsText(f);
       e.target.value = '';

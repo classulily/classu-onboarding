@@ -6,156 +6,367 @@
   <title>클래스유 입·퇴사 체크리스트</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
+    :root {
+      --red: #e8001c;
+      --red-soft: #fff0f2;
+      --bg: #f0f1f4;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --on: #059669;
+      --on-bg: #ecfdf5;
+      --off: #d97706;
+      --off-bg: #fffbeb;
+      --shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background: #f4f5f7;
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 24px 16px 48px;
     }
-    .wrap { max-width: 1080px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 28px; }
-    .logo { font-size: 26px; font-weight: 900; }
-    .logo span { color: #e8001c; }
-    .sub { font-size: 13px; color: #888; margin-top: 4px; }
 
-    .toolbar {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-      background: #fff; border-radius: 12px; padding: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 20px;
+    .topbar {
+      background: #111;
+      color: #fff;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 16px rgba(0,0,0,.15);
     }
+    .topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px; background: var(--red); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 16px;
+    }
+    .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
+    .brand p { font-size: 11px; color: #aaa; margin-top: 1px; }
+
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
     .btn {
-      border: none; border-radius: 8px; padding: 9px 14px;
-      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+      border: none; border-radius: 10px; padding: 9px 16px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: .15s;
     }
-    .btn-primary { background: #e8001c; color: #fff; }
-    .btn-secondary { background: #eee; color: #333; }
-    .btn:hover { opacity: .92; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-ghost { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.2); }
+    .btn-light { background: #f3f4f6; color: #333; }
+    .btn-light:hover { background: #e5e7eb; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
 
-    .summary {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px; margin-bottom: 20px;
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 48px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
     }
-    .sum-card {
-      background: #fff; border-radius: 10px; padding: 14px; text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    @media (max-width: 800px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+    .stat {
+      background: var(--card); border-radius: 14px; padding: 16px;
+      box-shadow: var(--shadow); text-align: center;
     }
-    .sum-card .n { font-size: 24px; font-weight: 800; color: #e8001c; }
-    .sum-card .l { font-size: 11px; color: #888; margin-top: 2px; }
+    .stat .num { font-size: 28px; font-weight: 900; color: var(--red); line-height: 1; }
+    .stat .lbl { font-size: 11px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+
+    .control-bar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      background: var(--card); border-radius: 14px; padding: 12px 14px;
+      box-shadow: var(--shadow); margin-bottom: 18px;
+    }
+
+    .tabs, .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1.5px solid var(--border); background: #fff; cursor: pointer;
+      color: #444; transition: .15s;
+    }
+    .chip:hover { border-color: #ccc; }
+    .chip.active { background: #111; color: #fff; border-color: #111; }
+    .chip.active-on { background: var(--on-bg); color: var(--on); border-color: #a7f3d0; }
+    .chip.active-off { background: var(--off-bg); color: var(--off); border-color: #fde68a; }
+
+    .search-wrap { flex: 1; min-width: 160px; }
+    .search-wrap input {
+      width: 100%; padding: 9px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+    }
+    .search-wrap input:focus { outline: none; border-color: var(--red); }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
     .panel {
-      background: #fff; border-radius: 14px; padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    .panel h2 { font-size: 16px; margin-bottom: 14px; }
+    .panel-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-head span { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-    .form-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px; align-items: end;
-    }
-    label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
-    input, select {
-      width: 100%; padding: 9px 10px; border: 1px solid #ddd;
-      border-radius: 8px; font-family: inherit; font-size: 14px;
-    }
+    .person-list { max-height: calc(100vh - 280px); overflow-y: auto; }
+    @media (max-width: 900px) { .person-list { max-height: 280px; } }
 
-    .cards { display: grid; gap: 14px; }
-    .card { background: #fff; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-    .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-    .name { font-size: 18px; font-weight: 700; }
+    .person-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: .12s;
+      border-left: 3px solid transparent;
+    }
+    .person-item:hover { background: #fafafa; }
+    .person-item.selected { background: var(--red-soft); border-left-color: var(--red); }
+    .person-item .row1 {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .person-item .pname { font-weight: 700; font-size: 15px; }
+    .person-item .pinfo { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .mini-bar {
+      height: 4px; background: #eee; border-radius: 2px; margin-top: 8px; overflow: hidden;
+    }
+    .mini-bar > div { height: 100%; background: var(--red); border-radius: 2px; }
+
     .badge {
-      font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 12px; margin-left: 6px;
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; flex-shrink: 0;
     }
-    .badge-on { background: #e8f5e9; color: #2e7d32; }
-    .badge-off { background: #fff3e0; color: #e65100; }
-    .meta { font-size: 12px; color: #777; margin-top: 3px; }
-    .pct { font-size: 13px; font-weight: 600; text-align: right; }
-    .bar { height: 7px; background: #eee; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-    .bar > div { height: 100%; background: #e8001c; }
+    .badge-on { background: var(--on-bg); color: var(--on); }
+    .badge-off { background: var(--off-bg); color: var(--off); }
+    .badge-done { background: #f3f4f6; color: #6b7280; }
 
-    .checks { display: grid; gap: 6px; margin-top: 10px; }
-    .check {
-      display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px;
-      border-radius: 8px; background: #fafafa; font-size: 14px;
+    .detail { min-height: 400px; }
+    .detail-empty {
+      padding: 80px 24px; text-align: center; color: var(--muted);
     }
-    .check.pending { background: #fff8f8; border: 1px solid #ffd0d0; }
-    .check.overdue { border: 1px solid #e8001c; background: #fff0f0; }
-    .check.done { opacity: .55; text-decoration: line-through; }
-    .check input { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; }
-    .small { font-size: 11px; color: #999; margin-top: 2px; }
-    .card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .detail-empty .icon { font-size: 40px; margin-bottom: 12px; opacity: .4; }
 
-    .empty { text-align: center; color: #888; padding: 40px 10px; }
+    .detail-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px;
+    }
+    .detail-head h2 { font-size: 22px; font-weight: 800; }
+    .detail-meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .progress-block { min-width: 140px; text-align: right; }
+    .progress-block .pct { font-size: 14px; font-weight: 700; }
+    .progress-bar {
+      height: 8px; background: #eee; border-radius: 4px; margin-top: 6px; overflow: hidden;
+    }
+    .progress-bar > div { height: 100%; background: var(--red); border-radius: 4px; }
+
+    .detail-actions {
+      padding: 12px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+
+    .check-groups { padding: 16px 22px 22px; }
+    .group-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      letter-spacing: .5px; margin: 16px 0 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .group-label:first-child { margin-top: 0; }
+    .group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .check-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 14px; border-radius: 12px; margin-bottom: 6px;
+      background: #fafafa; border: 1.5px solid transparent;
+      font-size: 14px; transition: .12s;
+    }
+    .check-item.pending { background: #fff; border-color: #fecdd3; }
+    .check-item.overdue { background: var(--red-soft); border-color: var(--red); }
+    .check-item.done { opacity: .5; }
+    .check-item.done .item-title { text-decoration: line-through; }
+    .check-item input[type=checkbox] {
+      width: 18px; height: 18px; margin-top: 2px; accent-color: var(--red); flex-shrink: 0; cursor: pointer;
+    }
+    .item-title { font-weight: 500; }
+    .item-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .tag-overdue {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      color: var(--red); background: #fff; padding: 1px 6px; border-radius: 4px;
+      border: 1px solid var(--red); margin-left: 6px;
+    }
+
     .modal-bg {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
-      align-items: center; justify-content: center; z-index: 100; padding: 16px;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(2px);
+      align-items: center; justify-content: center; z-index: 200; padding: 16px;
     }
     .modal-bg.open { display: flex; }
     .modal {
-      background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 520px;
+      background: #fff; border-radius: 18px; width: 100%; max-width: 480px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2); overflow: hidden;
     }
+    .modal-header {
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h3 { font-size: 17px; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; font-size: 22px; cursor: pointer; color: #999; line-height: 1;
+    }
+    .modal-body { padding: 22px; }
+    .form-field { margin-bottom: 14px; }
+    .form-field label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
+    .form-field input, .form-field select {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+    }
+    .form-field input:focus, .form-field select:focus { outline: none; border-color: var(--red); }
+    .type-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .type-btn {
+      padding: 12px; border: 2px solid var(--border); border-radius: 12px;
+      background: #fff; cursor: pointer; text-align: center; font-family: inherit;
+      transition: .15s;
+    }
+    .type-btn strong { display: block; font-size: 14px; }
+    .type-btn small { font-size: 11px; color: var(--muted); }
+    .type-btn.on.active { border-color: var(--on); background: var(--on-bg); }
+    .type-btn.off.active { border-color: var(--off); background: var(--off-bg); }
+    .modal-footer { padding: 0 22px 22px; display: flex; gap: 8px; }
+    .modal-footer .btn { flex: 1; padding: 12px; }
+
     .modal textarea {
-      width: 100%; height: 240px; margin: 10px 0; padding: 10px;
-      font-family: monospace; font-size: 13px; border: 1px solid #ddd; border-radius: 8px;
+      width: 100%; height: 260px; padding: 12px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: monospace; font-size: 13px; resize: vertical;
     }
-    .hint { font-size: 12px; color: #888; text-align: center; margin-top: 16px; line-height: 1.6; }
+
+    .footer-hint {
+      text-align: center; font-size: 12px; color: var(--muted);
+      margin-top: 20px; line-height: 1.7;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="header">
-      <div class="logo">Class<span>U</span></div>
-      <div class="sub">입·퇴사 체크리스트</div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon">U</div>
+        <div>
+          <h1>ClassU HR</h1>
+          <p>입·퇴사 체크리스트</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-ghost" id="exportBtn">JSON 백업</button>
+        <button class="btn btn-ghost" id="importBtn">JSON 복원</button>
+        <button class="btn btn-red" id="openAddBtn">+ 신규 등록</button>
+        <input type="file" id="importFile" accept=".json" hidden />
+      </div>
     </div>
+  </header>
 
-    <div class="toolbar">
-      <button class="btn btn-secondary" id="exportBtn">JSON 백업</button>
-      <button class="btn btn-secondary" id="importBtn">JSON 복원</button>
-      <input type="file" id="importFile" accept=".json" hidden />
-    </div>
+  <div class="container">
+    <div class="stats" id="stats"></div>
 
-    <div class="summary" id="summary"></div>
-
-    <div class="panel">
-      <h2>신규 등록</h2>
-      <div class="form-grid">
-        <div>
-          <label>이름 *</label>
-          <input id="name" placeholder="홍길동" />
-        </div>
-        <div>
-          <label>유형 *</label>
-          <select id="type">
-            <option value="온보딩">온보딩</option>
-            <option value="오프보딩">오프보딩</option>
-          </select>
-        </div>
-        <div>
-          <label>기준일 (입사/퇴사) *</label>
-          <input id="baseDate" type="date" />
-        </div>
-        <div>
-          <label>부서</label>
-          <input id="dept" placeholder="개발" />
-        </div>
-        <div>
-          <button class="btn btn-primary" id="addBtn" style="width:100%">체크리스트 생성</button>
-        </div>
+    <div class="control-bar">
+      <div class="tabs" id="viewTabs"></div>
+      <div class="filters" id="typeFilters"></div>
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="이름 검색..." />
       </div>
     </div>
 
-    <div class="cards" id="cards"></div>
-    <p class="hint">데이터는 이 브라우저에 저장됩니다. 주기적으로 JSON 백업을 권장합니다.</p>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-head">목록 <span id="listCount"></span></div>
+        <div class="person-list" id="personList"></div>
+      </div>
+      <div class="panel detail" id="detailPanel"></div>
+    </div>
+
+    <p class="footer-hint">데이터는 이 브라우저에 저장됩니다 · 주기적으로 JSON 백업 권장</p>
   </div>
 
-  <div class="modal-bg" id="modal">
+  <!-- 신규 등록 모달 -->
+  <div class="modal-bg" id="addModal">
     <div class="modal">
-      <strong>슬랙 공유 문구</strong>
-      <textarea id="slackText" readonly></textarea>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary" id="copyBtn">복사</button>
-        <button class="btn btn-secondary" id="closeModal">닫기</button>
+      <div class="modal-header">
+        <h3>신규 등록</h3>
+        <button class="modal-close" data-close="addModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>유형 *</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn on active" data-type="온보딩">
+              <strong>온보딩</strong><small>12개 항목 · 입사</small>
+            </button>
+            <button type="button" class="type-btn off" data-type="오프보딩">
+              <strong>오프보딩</strong><small>7개 항목 · 퇴사</small>
+            </button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>이름 *</label>
+          <input id="name" placeholder="홍길동" />
+        </div>
+        <div class="form-field">
+          <label id="dateLabel">입사일 *</label>
+          <input id="baseDate" type="date" />
+        </div>
+        <div class="form-field">
+          <label>부서</label>
+          <input id="dept" placeholder="개발, 마케팅..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-close="addModal">취소</button>
+        <button class="btn btn-red" id="addBtn">체크리스트 생성</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 슬랙 모달 -->
+  <div class="modal-bg" id="slackModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>슬랙 공유 문구</h3>
+        <button class="modal-close" data-close="slackModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="slackText" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-close="slackModal">닫기</button>
+        <button class="btn btn-red" id="copyBtn">복사</button>
       </div>
     </div>
   </div>
@@ -185,56 +396,118 @@
 
     const STORAGE_KEY = 'classu_onoff_checklist_v1';
     let data = load();
+    let state = {
+      view: 'active',
+      typeFilter: 'all',
+      search: '',
+      selectedId: null,
+      addType: '온보딩',
+    };
 
     function load() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : { people: [], checks: [], seq: 1 };
-      } catch { return { people: [], checks: [], seq: 1 }; }
+        return raw ? JSON.parse(raw) : { people: [], checks: [] };
+      } catch { return { people: [], checks: [] }; }
     }
-    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); render(); }
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      render();
+    }
 
     function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
-    function parseDate(s) { if (!s) return null; const d = new Date(s); d.setHours(0,0,0,0); return isNaN(d) ? null : d; }
-    function fmt(d) {
-      if (!d) return '';
-      const x = typeof d === 'string' ? parseDate(d) : d;
-      return `${x.getFullYear()}.${String(x.getMonth()+1).padStart(2,'0')}.${String(x.getDate()).padStart(2,'0')}`;
+    function parseDate(s) { if (!s) return null; const d = new Date(s + 'T00:00:00'); return isNaN(d) ? null : d; }
+    function fmt(s) {
+      const d = parseDate(s);
+      if (!d) return s || '';
+      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
     }
     function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
     function dueDate(base, rule) {
       const m = { 'D-7':-7,'D-5':-5,'D-3':-3,'입사당일':0,'입사후1주':7,'퇴사2주전':-14,'퇴사1주전':-7,'퇴사당일':0,'퇴사후1주':7 };
       return addDays(base, m[rule] ?? 0);
     }
-    function toISO(d) { return d.toISOString().slice(0,10); }
+    function toISO(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+    }
+
+    function personProgress(id) {
+      const checks = data.checks.filter(c => c.personId === id);
+      const done = checks.filter(c => c.done).length;
+      return { done, total: checks.length, pct: checks.length ? Math.round(done / checks.length * 100) : 0 };
+    }
+
+    function filteredPeople() {
+      return data.people.filter(p => {
+        if (state.view === 'active' && p.status === '완료') return false;
+        if (state.view === 'completed' && p.status !== '완료') return false;
+        if (state.typeFilter !== 'all' && p.type !== state.typeFilter) return false;
+        if (state.search && !p.name.includes(state.search)) return false;
+        return true;
+      }).sort((a, b) => {
+        const da = parseDate(a.baseDate), db = parseDate(b.baseDate);
+        return (da || 0) - (db || 0);
+      });
+    }
 
     function nextId(type, baseDate) {
       const prefix = type === '오프보딩' ? 'OF' : 'OB';
       const year = baseDate.getFullYear();
-      const same = data.people.filter(p => p.id.startsWith(`${prefix}-${year}-`));
-      const max = same.reduce((n, p) => Math.max(n, parseInt(p.id.split('-')[2],10)||0), 0);
-      return `${prefix}-${year}-${String(max+1).padStart(3,'0')}`;
+      const max = data.people
+        .filter(p => p.id.startsWith(`${prefix}-${year}-`))
+        .reduce((n, p) => Math.max(n, parseInt(p.id.split('-')[2], 10) || 0), 0);
+      return `${prefix}-${year}-${String(max + 1).padStart(3, '0')}`;
     }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    document.getElementById('openAddBtn').onclick = () => openModal('addModal');
+    document.querySelectorAll('[data-close]').forEach(el => {
+      el.onclick = () => closeModal(el.dataset.close);
+    });
+
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.addType = btn.dataset.type;
+        document.getElementById('dateLabel').textContent =
+          state.addType === '오프보딩' ? '퇴사일 *' : '입사일 *';
+      };
+    });
 
     document.getElementById('addBtn').onclick = () => {
       const name = document.getElementById('name').value.trim();
-      const type = document.getElementById('type').value;
       const base = parseDate(document.getElementById('baseDate').value);
       const dept = document.getElementById('dept').value.trim();
-      if (!name || !base) return alert('이름과 기준일을 입력해주세요.');
+      const type = state.addType;
+      if (!name || !base) return alert('이름과 날짜를 입력해주세요.');
 
       const id = nextId(type, base);
-      data.people.push({ id, name, type, baseDate: toISO(base), dept, status:'진행중' });
+      data.people.push({ id, name, type, baseDate: toISO(base), dept, status: '진행중' });
       MASTER.filter(m => m.type === type).forEach(m => {
         data.checks.push({
           id: `${id}-CHK-${String(m.order).padStart(2,'0')}`,
           personId: id, name, type, category: m.category, order: m.order,
-          item: m.item, deadline: m.deadline, dueDate: toISO(dueDate(base, m.deadline)),
+          item: m.item, deadline: m.deadline,
+          dueDate: toISO(dueDate(base, m.deadline)),
           assignee: m.assignee, done: false, doneDate: ''
         });
       });
+
       document.getElementById('name').value = '';
       document.getElementById('dept').value = '';
+      document.getElementById('baseDate').value = '';
+      state.selectedId = id;
+      state.view = 'active';
+      closeModal('addModal');
       save();
     };
 
@@ -243,32 +516,52 @@
       if (!c) return;
       c.done = done;
       c.doneDate = done ? toISO(today()) : '';
-      const items = data.checks.filter(x => x.personId === c.personId);
       const p = data.people.find(x => x.id === c.personId);
-      if (p) p.status = items.every(x => x.done) ? '완료' : '진행중';
+      if (p) {
+        const items = data.checks.filter(x => x.personId === p.id);
+        p.status = items.every(x => x.done) ? '완료' : '진행중';
+        if (p.status === '완료' && state.view === 'active') {
+          state.selectedId = p.id;
+        }
+      }
       save();
     }
 
     function removePerson(id) {
-      if (!confirm('삭제할까요?')) return;
+      if (!confirm('이 사람의 체크리스트를 삭제할까요?')) return;
       data.people = data.people.filter(p => p.id !== id);
       data.checks = data.checks.filter(c => c.personId !== id);
+      if (state.selectedId === id) state.selectedId = null;
       save();
+    }
+
+    function reopenPerson(id) {
+      const p = data.people.find(x => x.id === id);
+      if (p) {
+        p.status = '진행중';
+        state.view = 'active';
+        state.selectedId = id;
+        save();
+      }
     }
 
     function slackMsg(personId) {
       const p = data.people.find(x => x.id === personId);
-      const checks = data.checks.filter(c => c.personId === personId).sort((a,b)=>a.order-b.order);
+      const checks = data.checks.filter(c => c.personId === personId).sort((a,b) => a.order - b.order);
       const done = checks.filter(c => c.done);
       const pending = checks.filter(c => !c.done);
-      const pct = checks.length ? Math.round(done.length/checks.length*100) : 0;
+      const pct = checks.length ? Math.round(done.length / checks.length * 100) : 0;
       const emoji = p.type === '오프보딩' ? '📤' : '📋';
       const label = p.type === '오프보딩' ? '퇴사' : '입사';
       const lines = [
         `${emoji} *[${p.type}] ${p.name}님* (${fmt(p.baseDate)} ${label})`,
         `진행률: ${done.length}/${checks.length} (${pct}%)`, ''
       ];
-      if (done.length) { lines.push('*완료*'); done.forEach(c => lines.push(`✅ ${c.item}`)); lines.push(''); }
+      if (done.length) {
+        lines.push('*완료*');
+        done.forEach(c => lines.push(`✅ ${c.item}`));
+        lines.push('');
+      }
       if (pending.length) {
         lines.push('*미완료*');
         pending.forEach(c => {
@@ -279,19 +572,18 @@
         });
       }
       document.getElementById('slackText').value = lines.join('\n');
-      document.getElementById('modal').classList.add('open');
+      openModal('slackModal');
     }
 
     document.getElementById('copyBtn').onclick = () => {
       const t = document.getElementById('slackText');
       t.select();
-      document.execCommand('copy');
-      alert('복사되었습니다.');
+      navigator.clipboard?.writeText(t.value).then(() => alert('복사되었습니다.'))
+        .catch(() => { document.execCommand('copy'); alert('복사되었습니다.'); });
     };
-    document.getElementById('closeModal').onclick = () => document.getElementById('modal').classList.remove('open');
 
     document.getElementById('exportBtn').onclick = () => {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `입퇴사_백업_${toISO(today())}.json`;
@@ -305,6 +597,7 @@
       r.onload = () => {
         try {
           data = JSON.parse(r.result);
+          state.selectedId = null;
           save();
           alert('복원 완료');
         } catch { alert('JSON 파일이 올바르지 않습니다.'); }
@@ -313,69 +606,178 @@
       e.target.value = '';
     };
 
-    function render() {
-      const active = data.people.filter(p => p.status !== '완료');
-      let totalDone = 0, totalAll = 0, overdue = 0;
-      const t = today();
+    document.getElementById('searchInput').oninput = e => {
+      state.search = e.target.value.trim();
+      renderList();
+      renderDetail();
+    };
 
+    function renderStats() {
+      const t = today();
+      let overdue = 0, totalDone = 0, totalAll = data.checks.length;
       data.checks.forEach(c => {
-        totalAll++;
         if (c.done) totalDone++;
         else if (parseDate(c.dueDate) < t) overdue++;
       });
+      const active = data.people.filter(p => p.status !== '완료').length;
+      const onActive = data.people.filter(p => p.type === '온보딩' && p.status !== '완료').length;
+      const offActive = data.people.filter(p => p.type === '오프보딩' && p.status !== '완료').length;
+      const completed = data.people.filter(p => p.status === '완료').length;
 
-      document.getElementById('summary').innerHTML = `
-        <div class="sum-card"><div class="n">${active.length}</div><div class="l">진행 중</div></div>
-        <div class="sum-card"><div class="n">${data.people.filter(p=>p.type==='온보딩'&&p.status!=='완료').length}</div><div class="l">온보딩</div></div>
-        <div class="sum-card"><div class="n">${data.people.filter(p=>p.type==='오프보딩'&&p.status!=='완료').length}</div><div class="l">오프보딩</div></div>
-        <div class="sum-card"><div class="n">${totalAll?Math.round(totalDone/totalAll*100):0}%</div><div class="l">전체 완료율</div></div>
-        <div class="sum-card"><div class="n">${overdue}</div><div class="l">기한 지남</div></div>`;
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="num">${active}</div><div class="lbl">진행 중</div></div>
+        <div class="stat"><div class="num">${onActive}</div><div class="lbl">온보딩</div></div>
+        <div class="stat"><div class="num">${offActive}</div><div class="lbl">오프보딩</div></div>
+        <div class="stat"><div class="num">${completed}</div><div class="lbl">완료</div></div>
+        <div class="stat"><div class="num">${overdue}</div><div class="lbl">기한 지남</div></div>`;
+    }
 
-      const list = data.people.filter(p => p.status !== '완료');
+    function renderTabs() {
+      const activeN = data.people.filter(p => p.status !== '완료').length;
+      const doneN = data.people.filter(p => p.status === '완료').length;
+      document.getElementById('viewTabs').innerHTML = `
+        <button class="chip ${state.view==='active'?'active':''}" data-view="active">진행 중 (${activeN})</button>
+        <button class="chip ${state.view==='completed'?'active':''}" data-view="completed">완료 (${doneN})</button>`;
+      document.getElementById('viewTabs').querySelectorAll('.chip').forEach(chip => {
+        chip.onclick = () => {
+          state.view = chip.dataset.view;
+          state.selectedId = null;
+          render();
+        };
+      });
+
+      document.getElementById('typeFilters').innerHTML = `
+        <button class="chip ${state.typeFilter==='all'?'active':''}" data-filter="all">전체</button>
+        <button class="chip ${state.typeFilter==='온보딩'?'active-on':''}" data-filter="온보딩">온보딩</button>
+        <button class="chip ${state.typeFilter==='오프보딩'?'active-off':''}" data-filter="오프보딩">오프보딩</button>`;
+      document.getElementById('typeFilters').querySelectorAll('.chip').forEach(chip => {
+        chip.onclick = () => {
+          state.typeFilter = chip.dataset.filter;
+          state.selectedId = null;
+          render();
+        };
+      });
+    }
+
+    function renderList() {
+      const list = filteredPeople();
+      document.getElementById('listCount').textContent = `${list.length}명`;
+
       if (!list.length) {
-        document.getElementById('cards').innerHTML = '<div class="panel empty">진행 중인 입·퇴사자가 없습니다.<br>위에서 신규 등록해주세요.</div>';
+        document.getElementById('personList').innerHTML = `
+          <div class="detail-empty" style="padding:40px 16px">
+            <div class="icon">📋</div>
+            ${state.view === 'completed' ? '완료된 항목이 없습니다' : '등록된 사람이 없습니다'}<br>
+            <small style="color:#aaa">+ 신규 등록으로 추가하세요</small>
+          </div>`;
         return;
       }
 
-      document.getElementById('cards').innerHTML = list.map(p => {
-        const checks = data.checks.filter(c => c.personId === p.id).sort((a,b)=>a.order-b.order);
-        const done = checks.filter(c => c.done).length;
-        const pct = checks.length ? Math.round(done/checks.length*100) : 0;
-        const badge = p.type === '오프보딩' ? 'badge-off' : 'badge-on';
-        const checksHtml = checks.map(c => {
+      if (!state.selectedId || !list.find(p => p.id === state.selectedId)) {
+        state.selectedId = list[0].id;
+      }
+
+      document.getElementById('personList').innerHTML = list.map(p => {
+        const prog = personProgress(p.id);
+        const badgeCls = p.status === '완료' ? 'badge-done' : (p.type === '오프보딩' ? 'badge-off' : 'badge-on');
+        const dateLabel = p.type === '오프보딩' ? '퇴사' : '입사';
+        return `
+          <div class="person-item ${p.id === state.selectedId ? 'selected' : ''}" data-id="${p.id}">
+            <div class="row1">
+              <span class="pname">${esc(p.name)}</span>
+              <span class="badge ${badgeCls}">${p.type}</span>
+            </div>
+            <div class="pinfo">${esc(p.dept || '-')} · ${dateLabel} ${fmt(p.baseDate)}</div>
+            <div class="mini-bar"><div style="width:${prog.pct}%"></div></div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('personList').querySelectorAll('.person-item').forEach(el => {
+        el.onclick = () => {
+          state.selectedId = el.dataset.id;
+          renderList();
+          renderDetail();
+        };
+      });
+    }
+
+    function renderDetail() {
+      const panel = document.getElementById('detailPanel');
+      const list = filteredPeople();
+      const p = data.people.find(x => x.id === state.selectedId);
+
+      if (!p || !list.find(x => x.id === p.id)) {
+        panel.innerHTML = `
+          <div class="detail-empty">
+            <div class="icon">👈</div>
+            왼쪽 목록에서 사람을 선택하세요<br>
+            <small style="color:#aaa;margin-top:8px;display:block">또는 + 신규 등록으로 추가</small>
+          </div>`;
+        return;
+      }
+
+      const checks = data.checks.filter(c => c.personId === p.id).sort((a,b) => a.order - b.order);
+      const prog = personProgress(p.id);
+      const t = today();
+      const isCompleted = p.status === '완료';
+      const dateLabel = p.type === '오프보딩' ? '퇴사일' : '입사일';
+      const badgeCls = p.type === '오프보딩' ? 'badge-off' : 'badge-on';
+
+      const groups = {};
+      checks.forEach(c => {
+        if (!groups[c.category]) groups[c.category] = [];
+        groups[c.category].push(c);
+      });
+      const categoryOrder = ['HR', 'IT', '급여'];
+
+      const groupsHtml = categoryOrder.filter(g => groups[g]).map(g => {
+        const items = groups[g].map(c => {
           const overdue = !c.done && parseDate(c.dueDate) < t;
           const cls = c.done ? 'done' : (overdue ? 'overdue' : 'pending');
-          return `<label class="check ${cls}">
-            <input type="checkbox" ${c.done?'checked':''} onchange="toggleCheck('${c.id}', this.checked)" />
-            <div>
-              <div>${c.item}</div>
-              <div class="small">${c.category} · 마감 ${fmt(c.dueDate)}${c.assignee!=='HR'?' · '+c.assignee:''}</div>
-            </div>
-          </label>`;
+          const readonly = isCompleted ? 'disabled' : '';
+          return `
+            <label class="check-item ${cls}">
+              <input type="checkbox" ${c.done ? 'checked' : ''} ${readonly}
+                onchange="toggleCheck('${c.id}', this.checked)" />
+              <div>
+                <div class="item-title">${esc(c.item)}${overdue ? '<span class="tag-overdue">기한지남</span>' : ''}</div>
+                <div class="item-sub">마감 ${fmt(c.dueDate)}${c.assignee !== 'HR' ? ' · ' + esc(c.assignee) : ''}${c.done && c.doneDate ? ' · 완료 ' + fmt(c.doneDate) : ''}</div>
+              </div>
+            </label>`;
         }).join('');
-        return `<article class="card">
-          <div class="card-head">
-            <div>
-              <div class="name">${p.name}<span class="badge ${badge}">${p.type}</span></div>
-              <div class="meta">${p.dept||'-'} · ${fmt(p.baseDate)} · ${p.id}</div>
-            </div>
-            <div style="min-width:120px">
-              <div class="pct">${done}/${checks.length} (${pct}%)</div>
-              <div class="bar"><div style="width:${pct}%"></div></div>
-            </div>
-          </div>
-          <div class="checks">${checksHtml}</div>
-          <div class="card-actions">
-            <button class="btn btn-secondary" onclick="slackMsg('${p.id}')">슬랙 문구</button>
-            <button class="btn btn-secondary" onclick="removePerson('${p.id}')">삭제</button>
-          </div>
-        </article>`;
+        return `<div class="group-label">${g}</div>${items}`;
       }).join('');
+
+      panel.innerHTML = `
+        <div class="detail-head">
+          <div>
+            <h2>${esc(p.name)} <span class="badge ${badgeCls}">${p.type}</span></h2>
+            <div class="detail-meta">${esc(p.dept || '부서 미입력')} · ${dateLabel} ${fmt(p.baseDate)} · ${p.id}</div>
+          </div>
+          <div class="progress-block">
+            <div class="pct">${prog.done} / ${prog.total} 완료 (${prog.pct}%)</div>
+            <div class="progress-bar"><div style="width:${prog.pct}%"></div></div>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-red" onclick="slackMsg('${p.id}')">슬랙 문구</button>
+          ${isCompleted ? `<button class="btn btn-light" onclick="reopenPerson('${p.id}')">다시 진행중으로</button>` : ''}
+          <button class="btn btn-danger" onclick="removePerson('${p.id}')">삭제</button>
+        </div>
+        <div class="check-groups">${groupsHtml}</div>`;
+    }
+
+    function render() {
+      renderStats();
+      renderTabs();
+      renderList();
+      renderDetail();
     }
 
     window.toggleCheck = toggleCheck;
     window.slackMsg = slackMsg;
     window.removePerson = removePerson;
+    window.reopenPerson = reopenPerson;
     render();
   </script>
 </body>
